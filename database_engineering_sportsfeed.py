@@ -23,12 +23,15 @@ collection = db.nba_bio
 
 
 # Google API Servcies key
-gkey ="AIzaSyC5rGYUddVUFDYwhmshYciMpNeQxpa2YmQ"
+gkey ="Use your Google API Service Key"
 
 # List of seasons needed
 season=['2015-2016','2016-2017']
 # Intializing the index for each document being stored
 index=1
+
+# Initialize a variable to store the documents
+player_list=[];
 
 # For 2 seasons
 for j in range(0,2):
@@ -59,38 +62,58 @@ for j in range(0,2):
         except:
             birthcountry = "NA"
         
-        # Initialize the target city to retrive the latitude and longitude of place of birth
+       # Initialize the target city to retrive the latitude and longitude of place of birth
         target_city = birthcity+","+birthcountry
-        try:
-            target_url="https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s"%(target_city,gkey)
-            geo_data = requests.get(target_url).json()
-            lat = geo_data["results"][0]["geometry"]["location"]["lat"]
-            long =geo_data["results"][0]["geometry"]["location"]["lng"]
-        except:
-            lat="NA"
-            long="NA"
+        # Construct the target URL    
+        target_url="https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s"%(target_city,gkey)
+        
+        # If it is for the season 2015-2016
+        # OR if it is not the above season but the player is a rookie
+        # Then add the player details to the player_list
+        if (j == 0) or (j!=0 and player[i]["player"]["IsRookie"]=="true"):
+            try:
+                print(target_url)
+                geo_data = requests.get(target_url).json()
+                lat = geo_data["results"][0]["geometry"]["location"]["lat"]
+                long =geo_data["results"][0]["geometry"]["location"]["lng"]
+            except:
+                lat="NA"
+                long="NA"
+                
+            player_info={
+                'ID':index ,
+                'UniqueID': player[i]["player"]["ID"],
+                'FirstName': player[i]["player"]["FirstName"],
+                'LastName': player[i]["player"]["LastName"],
+                'Position':player[i]["player"]["Position"],
+                'BirthDate':player[i]["player"]["BirthDate"],
+                "BirthCity":birthcity,
+                "BirthCountry":birthcountry,
+                "BirthPlaceLat": lat,
+                "BirthPlaceLong": long,
+                "Height":height,
+                'Weight':weight,
+                'Team':  [{'TeamCity':player[i]["team"]["City"],
+                            'TeamName':player[i]["team"]["Name"],
+                            'TeamAbb':player[i]["team"]["Abbreviation"],
+                            'Year': season[j]}]
+                }
+            index= index+1
+            player_list.append(player_info)
             
-        post = {
-            'PlayerID':index ,
-            'Year': season[j],
-            'FirstName': player[i]["player"]["FirstName"],
-            'LastName': player[i]["player"]["LastName"],
-            'Position':player[i]["player"]["Position"],
-            'BirthDate':player[i]["player"]["BirthDate"],
-            "BirthCity":birthcity,
-            "BirthCountry":birthcountry,
-            "BirthPlaceLat": lat,
-            "BirthPlaceLong": long,
-            "Height":height,
-            'Weight':weight,
-            'TeamCity':player[i]["team"]["City"],
-            'TeamName':player[i]["team"]["Name"],
-            'TeamAbb':player[i]["team"]["Abbreviation"]
-        }
-        # Insert the document into the collection
-        collection.insert_one(post)
-        # Incrementing the index by 1 for the next document
-        index=index+1
+        # If player is already available in the list then find the corresponding element in player_info 
+        # And append to the already existing team info
+        else:
+            for k in range(0,len(player_list)):
+                if player_list[k]["UniqueID"]==player[i]["player"]["ID"]:
+                    player_list[k]["Team"].append({'TeamCity':player[i]["team"]["City"],
+                        'TeamName':player[i]["team"]["Name"], 
+                        'TeamAbb':player[i]["team"]["Abbreviation"],
+                        'Year': season[j]})
+                        
+# Insert each document into the database collection
+for b in range(0,len(player_list)):
+    collection.insert_one(player_list[b])
 
 # Verify results:
 results = db.nba_bio.find()
