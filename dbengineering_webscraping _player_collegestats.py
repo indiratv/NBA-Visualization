@@ -1,4 +1,4 @@
-#Webscraping the https://www.basketball-reference.com website to get the nba college stats for all the nba players in our masterdata collection - nba_bio in the nba database
+#Webscraping the https://www.basketball-reference.com website to get the nba player info and college stats for all the nba players in our masterdata collection - nba_bio in the nba database
 
 #Start the mongodb server in the console. Run this file to scrape the web for all the players in the nba_bio collection in nba database. The result is a collection - nba_collg in the nba database with the data scraped.
 
@@ -30,7 +30,10 @@ def get_allurls():
         collg_stats_dict['ID'] = result['ID']
         collg_stats_dict['FirstName'] = result['FirstName']
         collg_stats_dict['LastName'] = result['LastName']
-        playerurl = result['LastName'][:1].lower() + '/' + result['LastName'][:5].lower() + result['FirstName'][:2].lower() + '01' + ".html#all_all_college_stats"
+        if result['FirstName'][1] == '.':
+            playerurl = result['LastName'][:1].lower() + '/' + result['LastName'][:5].lower() + result['FirstName'][0].lower() + result['FirstName'][2].lower() + '01' + ".html#all_all_college_stats"
+        else:
+            playerurl = result['LastName'][:1].lower() + '/' + result['LastName'][:5].lower() + result['FirstName'][:2].lower() + '01' + ".html#all_all_college_stats"
         collg_stats_dict['url'] = baseurl + playerurl
         collg_stats_list.append(collg_stats_dict)
 #Return a list of dictionaries, each dictionary representing a player info
@@ -77,22 +80,140 @@ def scrape_all_players():
 #Loop thru each player
     for player in collg_stats_list_intital:
         collg_stats_listitem = {}
+        collg_stats_byplayer = {}
+        collg_player_info = {}
         url = player['url']
 #Get college stats for each player
-        collg_stats_byplayer = get_player_totals(url)
-        collg_stats_listitem['ID'] = player['ID']
-        collg_stats_listitem['FirstName'] = player['FirstName']
-        collg_stats_listitem['LastName'] = player['LastName']
-        collg_stats_listitem['collg-stats'] = collg_stats_byplayer
+        try:
+            collg_stats_byplayer = get_player_totals(url)
+            collg_player_info = get_player_info(url)
+            collg_stats_listitem['ID'] = player['ID']
+            collg_stats_listitem['FirstName'] = player['FirstName']
+            collg_stats_listitem['LastName'] = player['LastName']
+            collg_stats_listitem['picurl'] = collg_player_info["picurl"]
+            collg_stats_listitem['College'] = collg_player_info["collg"]
+            collg_stats_listitem["Collgcity"] = collg_player_info["collgcity"]
+            collg_stats_listitem["Cglat"] = collg_player_info["cglat"]
+            collg_stats_listitem["Cglong"] = collg_player_info["cglong"] 
+            collg_stats_listitem["HighSchool"] = collg_player_info["hs"] 
+            collg_stats_listitem["Hscity"] = collg_player_info["hscity"]
+            collg_stats_listitem["Hsstate"] = collg_player_info["hsstate"]
+            collg_stats_listitem["Hslat"] = collg_player_info["hslat"]
+            collg_stats_listitem["Hslong"] = collg_player_info["hslong"] 
+            collg_stats_listitem['collg-stats'] = collg_stats_byplayer
+        except:
+            pass
 #Add all elements to a list
         collg_stats_list.append(collg_stats_listitem)
 #Returns a list of dictionaries containing all players info and college stats
     return collg_stats_list
 
-#Call the scrape_all_players() function.Returns a list of dictionaries containing all players info and college stats
+def geocode(address):
+#Insert your geocoding api key here
+    gkey = ""
+    target_city = address
+    try:
+        target_url="https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s"%(target_city,gkey)
+#         print(target_url)
+        geo_data = requests.get(target_url).json()
+        lat = geo_data["results"][0]["geometry"]["location"]["lat"]
+        long =geo_data["results"][0]["geometry"]["location"]["lng"]
+    except:
+        lat="NA"
+        long="NA"
+    return lat,long
+
+def get_player_info(url):
+    url = url
+    print(url)
+    player_info = {}
+    soup = make_soup(url)
+    try:
+        picurl = soup.find('div',class_='media-item').find('img')['src']
+    except:
+        picurl = 'NA'
+    player_info["picurl"] = picurl
+    paras = soup.find('div',{'id':'meta'}).findAll('p')
+    flagc = 0
+    flagh = 0
+    for para in paras:
+    #     print(para.text)
+        if("College:" in para.text):
+            flagc = 1
+            if("," in para.find('a').text):
+                collg = (para.find('a').text).partition(',')[0].strip()
+                collgcity = (para.find('a').text).partition(',')[2].strip()
+                cglat = geocode(collg)[0]
+                cglong = geocode(collg)[1]
+                player_info["collg"] = collg
+                player_info["collgcity"] = collgcity
+                player_info["cglat"] = cglat
+                player_info["cglong"] = cglong
+            else:
+                collg = (para.find('a').text).strip()
+                collgcity = 'NA'
+                cglat = geocode(collg)[0]
+                cglong = geocode(collg)[1]
+                player_info["collg"] = collg
+                player_info["collgcity"] = collgcity
+                player_info["cglat"] = cglat
+                player_info["cglong"] = cglong
+
+        if("High School" in para.text):
+            flagh = 1
+            if("in" in para.text):
+        #             print((para.text).partition(' in'))
+                    hs = ((para.text).partition(' in')[0]).partition('High School:')[2].strip()
+                    hscity = ((para.text).partition(' in')[2]).partition(',')[0].strip()
+                    hsstate = ((para.text).partition(' in')[2]).partition(',')[2].strip()
+                    target_add = hscity + "," + hsstate
+                    hslat = geocode(target_add)[0]
+                    hslong = geocode(target_add)[1]
+                    player_info["hs"] = hs
+                    player_info["hscity"] = hscity
+                    player_info["hsstate"] = hsstate
+                    player_info["hslat"] = hslat
+                    player_info["hslong"] = hslong
+            else:
+                    hs = (para.text).strip()
+                    hscity = 'NA'
+                    hsstate = 'NA'
+                    hslat = geocode(hs)[0]
+                    hslong = geocode(hs)[1]
+                    player_info["hs"] = hs
+                    player_info["hscity"] = hscity
+                    player_info["hsstate"] = hsstate
+                    player_info["hslat"] = hslat
+                    player_info["hslong"] = hslong
+    if(flagc == 0):
+            collg = 'NA'
+            collgcity = 'NA'
+            cglat = 'NA'
+            cglong = 'NA'
+            player_info["collg"] = collg
+            player_info["collgcity"] = collgcity
+            player_info["cglat"] = cglat
+            player_info["cglong"] = cglong
+    if(flagh == 0):
+            hs = 'NA'
+            hscity = 'NA'
+            hsstate = 'NA'
+            hslat = 'NA'
+            hslong = 'NA'
+            player_info["hs"] = hs
+            player_info["hscity"] = hscity
+            player_info["hsstate"] = hsstate
+            player_info["hslat"] = hslat
+            player_info["hslong"] = hslong
+            
+    return player_info
+
+# #Call the scrape_all_players() function.Returns a list of dictionaries containing all players info and college stats
 nba_collg = scrape_all_players()
 
 #In nba db, create a nba_collg collection
+conn = 'mongodb://localhost:27017'
+client = pymongo.MongoClient(conn)
 db = client.nba
 collection = db.nba_collg
 

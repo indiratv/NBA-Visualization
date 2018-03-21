@@ -1,9 +1,10 @@
 
-## Web-scraping the "basketball-reference" website to get the NBA college stats for NBA players
+## Web-scraping the "basketball-reference" website to get the NBA player info and college stats for NBA players
 
 ### Pre-requisites:
  
 * The nba db  should be created in the mongodb with the collection - nba_bio and all the players data.
+* Add your google API key before running the file
 
 ### To Run this File-
 
@@ -13,6 +14,7 @@
 
 ### Exception Handling:
  
-* The 'G' key of the college_stats dictionary shows 'NA' when there is no college stats data available for a player. 
+* The 'G' key of the college_stats dictionary shows 'NA' when there is no college stats data available for a player.
+* The 'collg' field is also 'NA' when a player did not attend college or there is no info. 
 
 
