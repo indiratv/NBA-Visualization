@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+.label{
+	font-size:22.5px;
+	fill:#ffffff;
+	text-anchor:middle;
+	alignment-baseline:middle;
+}
+.face{
+	stroke:#c8c8c8;
+	stroke-width:2;
+}
+.minorTicks{
+	stroke-width:2;
+	stroke:white;
+}
+.majorTicks{
+	stroke:white;
+	stroke-width:3;
+}
+
+</style>
+<body>
+	<canvas id="GaugePlot">
+			<svg width="400" height="400"></svg>
+	</canvas>
+
+<script src="https://d3js.org/d3.v3.min.js"></script>
+<script src="http://vizjs.org/viz.v1.0.0.min.js"></script>
+<script>
+  var gauge=d3.select("#GaugePlot")
+  var svg=d3.select("svg");
+  var g=svg.append("g").attr("transform","translate(200,200)");
+  var domain = [0,100];
+  
+  var gg = viz.gg()
+	.domain(domain)
+	.outerRadius(150)
+	.innerRadius(30)
+	.value(0.5*(domain[1]+domain[0]))
+	.duration(1000);
+  
+  gg.defs(svg);
+  g.call(gg);  
+  
+  d3.select(self.frameElement).style("height", "700px");
+  setInterval( function(){gg.setNeedle(domain[0]+Math.random()*(domain[1]-domain[0]));},2000);
+</script>
+</body>
+</html>
