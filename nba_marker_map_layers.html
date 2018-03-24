@@ -84,9 +84,22 @@ d3.json("nba_collg.json", function(response){
   }
 });
 
-  L.control.layers(overlayMaps).addTo(myMap);
+//Target City
 
+var targetCity = city + "," + state;
+var gkey = "AIzaSyCxKPSTYYmUq6eMQqv3gZnAT-v4zPzp5pY"
+var queryURL = "https://maps.googleapis.com/maps/api/geocode/json?address=" + targetCity + "s&key=" + gkey;
 
+d3.json(queryURL, function(error, response) {
+  L.circle([results.geometry.location.lat, results.geometry.location.lng],{
+    fillOpacity: 0.2,
+    color: "white",
+    fillColor: "white",
+    radius: 100px
+  }).addTo(myMap);
+};
+
+L.control.layers(overlayMaps).addTo(myMap);
 
 </script>
 
