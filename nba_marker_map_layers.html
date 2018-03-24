@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>NBA PLAYER LOCATIONS</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="nba_bio.js"></script>
+
+  </head>
+<body>
+
+<div id="map"></div>
+
+<style>
+
+  body {
+    padding: 0px;
+    margin: 0px;
+  }
+
+  #map,
+  body,
+  html {
+    height: 100%;
+  }
+
+</style>
+
+<script type="text/javascript">
+
+var mapbox = 'https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1Ijoia2pnMzEwIiwiYSI6ImNpdGRjbWhxdjAwNG0yb3A5b21jOXluZTUifQ.T6YbdDixkOBWH_k9GbS8JQ'
+
+
+var colleges = new L.LayerGroup();
+var highSchools = new L.LayerGroup();
+
+
+//Create overlay object
+var overlayMaps = {
+"College Locations": colleges,
+"High School Location": highSchools
+};
+
+
+
+var myMap = L.map("map", {
+center: [25.698277, 1.240623],
+zoom: 3,
+layers: [colleges, highSchools]
+});
+
+// Create a baseMaps object
+var baseMaps = L.tileLayer(mapbox).addTo(myMap);
+
+
+
+//HIGH SCHOOL LOCATIONS
+d3.json("nba_collg.json", function(response){
+
+  console.log(response);
+
+  for (var i = 0; i < response.length; i++) {
+    var collegeLocation = response[i];
+    if (collegeLocation.Cglat != "NA" || collegeLocation.Cglong != "NA") {
+      if(typeof collegeLocation.Cglat !== "undefined") {(
+        L.marker([collegeLocation["Cglat"], collegeLocation["Cglong"]]).addTo(colleges).bindPopup("<h1>" + collegeLocation.College + "</h1>")
+        )
+      } 
+    }
+  };
+
+  for (var i = 0; i < response.length; i++) {
+    var highSchoolLocation = response[i];
+    if (highSchoolLocation.Hslat != "NA" || highSchoolLocation.Hslong != "NA") {
+      if(typeof highSchoolLocation.Cglat !== "undefined") {
+        L.marker([highSchoolLocation["Hslat"], highSchoolLocation["Hslong"]]).addTo(highSchools).bindPopup("<h1>" + highSchoolLocation.HighSchool + "</h1> <hr> <h3>" + highSchoolLocation.Hscity + ", " + highSchoolLocation.Hsstate + "</h3")
+        console.log()
+      }
+    }
+  }
+});
+
+  L.control.layers(overlayMaps).addTo(myMap);
+
+
+
+</script>
+
+</body>
+</html>

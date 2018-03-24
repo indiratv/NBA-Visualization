@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>NBA PLAYER LOCATIONS</title>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script type="text/javascript" src="nba_bio.js"></script>
+
+  </head>
+<body>
+
+<div id="map"></div>
+
+<style>
+
+  body {
+    padding: 0px;
+    margin: 0px;
+  }
+
+  #map,
+  body,
+  html {
+    height: 100%;
+  }
+
+</style>
+
+<script type="text/javascript">
+
+var mapbox = 'https://api.mapbox.com/styles/v1/mapbox/light-v9/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1Ijoia2pnMzEwIiwiYSI6ImNpdGRjbWhxdjAwNG0yb3A5b21jOXluZTUifQ.T6YbdDixkOBWH_k9GbS8JQ'
+
+var birthPlaces = new L.LayerGroup();
+var colleges = new L.LayerGroup();
+var highSchools = new L.LayerGroup();
+
+
+//Create overlay object
+var overlayMaps = {
+"Birth Place Locations": birthPlaces,
+"College Locations": colleges,
+"High School Locations": highSchools
+};
+
+//Create map layers
+var myMap = L.map('map', {
+  center: [25.698277, 1.240623],
+  zoom: 3,
+  layers: [birthPlaces, colleges, highSchools]
+});
+
+var baseMaps = L.tileLayer(mapbox).addTo(myMap);
+
+
+//BIRTHPLACE HEATMAP
+
+d3.json("nba_bio.json", function(response){
+  var heatArray = [];
+  for (var i = 0; i < response.length; i++) {
+    // console.log(response[i])
+    var location = response[i];
+    if (location["BirthPlaceLat"] != "NA" || location["BirthPlaceLong"] != "NA") {
+      if(typeof location["BirthPlaceLat"] !== "undefined") {
+        heatArray.push([location["BirthPlaceLat"], location["BirthPlaceLong"]])
+      }     
+    }
+  }
+  var heat = L.heatLayer(heatArray, {
+  radius: 45,
+  blur: 50,
+  minOpacity: 0.9,
+  max: 100
+  }).addTo(birthPlaces); 
+});
+
+
+// //COLLEGE HEATMAP
+
+d3.json("nba_collg.json", function(response){
+  var heatArray1 = [];
+  for (var i = 0; i < response.length; i++) {
+    // console.log(response[i])
+    var location = response[i];
+    if (location["Cglat"] != "NA" || location["Cglong"] != "NA") {
+      if(typeof location["Cglat"] !== "undefined") {
+        heatArray1.push([location["Cglat"], location["Cglong"]])
+      }   
+    }
+  }
+  var heat1 = L.heatLayer(heatArray1, {
+  radius: 45,
+  blur: 70,
+  minOpacity: 0.9,
+  max: 100
+  }).addTo(colleges);   
+});
+
+
+// //HIGH SCHOOL HEATMAP
+
+d3.json("nba_collg.json", function(response){
+  var heatArray2 = [];
+  for (var i = 0; i < response.length; i++) {
+    // console.log(response[i])
+    var location = response[i];
+    if (location["Hslat"] != "NA" || location["Hslong"] != "NA") {
+      if(typeof location["Hslat"] !== "undefined") {
+        heatArray2.push([location["Hslat"], location["Hslong"]])
+      }  
+    }
+  }
+  var heat2 = L.heatLayer(heatArray2, {
+  radius: 45,
+  blur: 70,
+  minOpacity: 0.9,
+  max: 100
+  }).addTo(highSchools);    
+});
+
+L.control.layers(overlayMaps).addTo(myMap);
+
+</script>
+
+</body>
+</html>
