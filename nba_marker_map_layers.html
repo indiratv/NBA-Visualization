@@ -86,18 +86,22 @@ d3.json("nba_collg.json", function(response){
 
 //Target City
 
-var targetCity = city + "," + state;
+var targetCity = "Chester,NJ";
 var gkey = "AIzaSyCxKPSTYYmUq6eMQqv3gZnAT-v4zPzp5pY"
 var queryURL = "https://maps.googleapis.com/maps/api/geocode/json?address=" + targetCity + "s&key=" + gkey;
 
 d3.json(queryURL, function(error, response) {
-  L.circle([results.geometry.location.lat, results.geometry.location.lng],{
-    fillOpacity: 0.2,
-    color: "white",
-    fillColor: "white",
-    radius: 100px
+  //console.log(response);
+  console.log(response["results"][0]["geometry"]["location"]["lat"]);
+  // var location1 = [response.results.geometry.location.lat, response.results.geometry.location.lng];
+  // console.log(location1)
+  L.circle([response["results"][0]["geometry"]["location"]["lat"],response["results"][0]["geometry"]["location"]["lng"]], {
+    fillOpacity: 0.7,
+    color: "navy",
+    fillColor: "lightblue",
+    radius: 500000
   }).addTo(myMap);
-};
+});
 
 L.control.layers(overlayMaps).addTo(myMap);
 
