@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <title>Making of a NBA Star</title>
+  <!-- Bootstrap core CSS-->
+  <link href="static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom fonts for this template-->
+  <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/solid.js" integrity="sha384-+Ga2s7YBbhOD6nie0DzrZpJes+b2K1xkpKxTFFcx59QmVPaSA8c7pycsNaFwUK6l" crossorigin="anonymous"></script>
+  <script defer src="https://use.fontawesome.com/releases/v5.0.8/js/fontawesome.js" integrity="sha384-7ox8Q2yzO/uWircfojVuCQOZl+ZZBg2D2J5nkpLqzH1HY0C1dHlTKIbpRz/LG23c" crossorigin="anonymous"></script>
+  <link href="static/vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <!-- Plotly-->
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <!--Leaflet CSS and JS-->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
+  <!--D3-->
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+  <!---CHARTS.JS-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.4.0/Chart.min.js"></script>
+  <!-- Custom styles for this template-->
+  <link href="static/css/sb-admin.css" rel="stylesheet">
+  <link href="static/css/index.css" rel="stylesheet">
+  <!--jquery-->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <!--HEATMAP-->
+  <script type="text/javascript" src="static/js/nba_bio.js"></script>
+
+</head>
+
+<body class="fixed-nav sticky-footer bg-dark" id="page-top">
+  <!-- Navigation-->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+    <a class="navbar-brand" href="home">Making of a NBA Star</a>
+    <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarResponsive">
+      <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
+          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="NBA Statistics">
+            <a class="nav-link" href="home">
+              <i class="fas fa-basketball-ball"></i>
+              <span class="nav-link-text">NBA Statistics</span>
+            </a>
+          </li>
+          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="My Dashboard" style="visibility: visible" id="MyDashboard"> 
+              <a class="nav-link" href="charts">
+                <i class="fas fa-user"></i>
+                <span class="nav-link-text">My Dashboard</span>
+              </a>
+          </li>
+          <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Data" style="visibility: visible" id="Data"> 
+            <a class="nav-link" href="data">
+              <i class="fas fa-database"></i>
+              <span class="nav-link-text">Data</span>
+            </a>
+          </li>
+        </ul>
+      <ul class="navbar-nav sidenav-toggler">
+        <li class="nav-item">
+          <a class="nav-link text-center" id="sidenavToggler">
+            <i class="fas fa-fw fa-angle-left"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  <!--Navigation-->
+
+  <div class="content-wrapper">
+    <div class="container-fluid">
+      <!-- Breadcrumbs-->
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="#">Visualizations</a>
+        </li>
+        <!--li class="breadcrumb-item active">My Dashboard</li-->
+      </ol>
+      
+      <!-- Map Chart Example-->
+      <div class="card mb-3">
+        <div class="card-header">
+          <i class="fas fa-globe"></i> NBA Visualizations are HEATING UP!!</div>
+        <div class="card-body">
+          <div id="map">
+
+          </div>
+        </div>
+        <div class="card-footer small text-muted">Click on the various layers to understand where NBA PLayers were born, which college and highschool did they attend?</div>
+      </div>
+      <div class="row">
+        <div class="col-lg-12">
+          <!-- Example Bar Chart Card-->
+          <div class="card mb-3">
+            <div class="card-header">
+              <i class="fas fa-chart-bar"></i> Perfect Time to be BORN for NBA PLayer</div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-sm-12 my-auto">
+                  <div id="myBarChart" width="100%" height="100%"></div>
+
+                </div>
+              </div>
+            </div>
+            <div class="card-footer small text-muted"></div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-6">
+          <!-- Example Pie Chart Card-->
+          <div class="card mb-3">
+            <div class="card-header">
+                <i class="fas fa-chart-pie"></i> Perfect First Name to be a NBA Player</div>
+            <div class="card-body" style="height:100%;width:100%;">
+              <canvas id="myChart" width="600" height="600"></canvas>
+            </div>
+            <div class="card-footer small text-muted">These are the top 10 First Names</div>
+          </div>
+        </div>
+      </div>
+    </div>
+        
+
+    <!-- /.container-fluid-->
+    <!-- /.content-wrapper-->
+    <footer class="sticky-footer">
+      <div class="footer-social">
+        <div class="container text-center" style:"font-size:40px;">
+          <a href="https://github.com/KKopacz1/NBA-Visualization">
+          <i class="fa fa-github" ></i> Git Repository
+          </a>
+          
+        </div>
+      </div>
+      <div class="footer-main" style="color:#fff;">
+        <div class="container text-center">
+          <small>Copyright © Making of a NBA Player 2018</small>
+        </div>
+      </div>
+
+    </footer>
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+      <i class="fa fa-angle-up"></i>
+    </a>
+    <!-- Bootstrap core JavaScript-->
+    <script src="static/vendor/jquery/jquery.min.js"></script>
+    <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Core plugin JavaScript-->
+    <script src="static/vendor/jquery-easing/jquery.easing.min.js"></script>
+    <!-- Custom scripts for all pages-->
+    <script src="static/js/sb-admin.min.js"></script>
+    <script src="static/js/app.js"></script>
+  </div>
+</body>
+
+</html>

@@ -1,6 +1,33 @@
-# NBA Data-Engineering of Sports Feed for Season 2015-2016 and 2016-2017.
+# Making of a NBA Star
 
-* Insert your Google API Key to proceed getting the latitude and longitude
-* Run the python File to create the NBA database in Mongo DB
+## Preview
 
-Note: The duplication of players has been removed and the Team variable for each player is a dictionary of team details showing team details for the corresponding season
+This application tells you about the ideal firstname, birth date and birth place for becoming a NBA Player, the colleges and highschools that provide a chance to acheiving your dreams to being a NBA Player and also your chances of becoming one analysing your current stats.
+**[View Live Preview]()**
+
+## Usage
+
+### Database
+
+ * Mongo
+
+### Javascript Libraries
+
+* Plotly
+* D3
+* Leaflet
+* Charts
+* Treant
+
+
+### API Used
+
+* Google Geocoding API
+* [My Sports Feed](https://www.mysportsfeeds.com/browse/)
+
+### Data Extraction Websites
+
+* [Basketball Reference](https://www.basketball-reference.com)
+
+
+
