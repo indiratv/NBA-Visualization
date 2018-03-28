@@ -22,7 +22,8 @@ db = client.nba
 nba_bio_collection = db.nba_bio 
 nba_collg_collection = db.nba_collg
 
-# App route definitions@app.route("/")
+# App route definitions
+@app.route("/")
 @app.route("/index")
 def landing():
     return(render_template("index.html"))
@@ -43,9 +44,12 @@ def data():
 @app.route("/nba-bio") 
 def pymongo_nba_bio_display():
     nba_bio_result=[]
+    print("About to call mongo")
     cursor = nba_bio_collection.find({})
+    print("Cursor")
     for document in cursor:
         document.pop("_id")
+        print(document)
         nba_bio_result.append(document)
     return jsonify(nba_bio_result)
 
@@ -306,6 +310,7 @@ def pymongo_nba_birthdays():
         # resultzj = dict(zip(monthz,resultz))
     print(resultzj)
     return (jsonify(resultzj))
+    
 
 # Run the Application
 if __name__ == "__main__":
